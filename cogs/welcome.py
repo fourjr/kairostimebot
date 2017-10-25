@@ -17,7 +17,7 @@ After you are done, type agree in <#244114075716419584> and you will be all read
 
 If you are from a Kairos Kingdom Clan, drop a message in <#287328907160715265> to get your roles settled!'''
             )
-        except discord.Forbidden:
+        except:
             pass
 
     async def on_message(self, message):
@@ -27,7 +27,7 @@ If you are from a Kairos Kingdom Clan, drop a message in <#287328907160715265> t
                 if message.author.avatar_url.startswith('https://cdn.discordapp.com/embed/avatars/'):
                     try:
                         await message.author.send('Please get a profile picture on discord first! You can refer to this support article: https://support.discordapp.com/hc/en-us/articles/204156688-How-do-I-change-my-avatar-')
-                    except discord.Forbidden:
+                    except:
                         await discord.utils.get(message.guild.channels, id=244114075716419584).send(f'{message.author.mention}, please get a profile picture on discord first! You can refer to this support article: https://support.discordapp.com/hc/en-us/articles/204156688-How-do-I-change-my-avatar-')
                     return
                 await message.author.add_roles(discord.utils.get(message.guild.roles, id=243812023085826048), discord.utils.get(message.guild.roles, id=337301153622654976), reason='Member said agree') #vg, cr
@@ -37,7 +37,7 @@ If you are from a Kairos Kingdom Clan, drop a message in <#287328907160715265> t
             else:
                 try:
                     await message.author.send("Hello from the Kairos Kingdom Discord! Make sure you've read the rules in <#244125181746872320> and then type `agree` in the <#244114075716419584> channel so we know you've read them!")
-                except discord.Forbidden:
+                except:
                     await discord.utils.get(message.guild.channels, id=244114075716419584).send(f"Hello {message.author.mention} from the Kairos Kingdom Discord! Make sure you've read the rules in <#244125181746872320> and then type `agree` in the <#244114075716419584> channel so we know you've read them!")
 
 def setup(bot):
