@@ -22,6 +22,7 @@ If you are from a Kairos Kingdom Clan, drop a message in <#287328907160715265> t
 
     async def on_message(self, message):
         if message.channel.id == 244114075716419584:
+            if message.author.bot: return 
             #if message.author.bot and message.author.id != 372748944448552961: await message.delete()
             if message.content == 'agree':
                 if message.author.avatar_url.startswith('https://cdn.discordapp.com/embed/avatars/'):
