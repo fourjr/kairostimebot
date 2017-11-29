@@ -11,7 +11,6 @@ import traceback
 from contextlib import redirect_stdout
 import discord
 from discord.ext import commands
-from ext.formatter import EmbedHelp
 
 def token():
     '''Returns your token wherever it is'''
@@ -27,7 +26,7 @@ def prefix():
     try:
         with open('data/config.json') as f:
             config = json.load(f)
-            return 'k!'
+            return 'b!'
     except:
         return 'k!' 
 
@@ -40,35 +39,8 @@ def heroku():
     except:
         return True
 
-bot = commands.Bot(command_prefix=prefix(), formatter=EmbedHelp())
+bot = commands.Bot(command_prefix=prefix())
 bot.remove_command('help')
-
-async def getdata(message):
-    await discord.utils.get(discord.utils.get(bot.guilds, id=359577438101176320).channels, id=370240126795776000).send(message)
-
-async def getdata2(message):
-    await discord.utils.get(discord.utils.get(bot.guilds, id=359577438101176320).channels, id=371244319660834817).send(message)
-
-def check(msg):
-    return msg.author.id == 249891250117804032 and msg.channel.id == 370240126795776000
-
-def checksplit(msg):
-    return msg.author.id == 249891250117804032 and msg.channel.id == 371244319660834817 and msg.content.split()[0] == str(bot.tempvar)
-
-def emoji(name:str):
-    if name == 'chestmagic': name = 'chestmagical'
-    emoji = discord.utils.get(bot.emojis, name=name)
-    try:
-        return '<:{}:{}>'.format(emoji.name, emoji.id)
-    except:
-        return name
-    
-bot.emoji = emoji 
-bot.getdata = getdata
-bot.getdata2 = getdata2
-bot.check = check
-bot.checksplit = checksplit
-bot.tempvar = ''
 bot.heroku = heroku
 
 _extensions = ['cogs.welcome']
@@ -85,6 +57,17 @@ User ID: {}
 ------------------------------------------'''.format(bot.user, bot.user.id))
     await bot.change_presence(game=discord.Game(name="Clash Royale!"))
 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user: return
+    if 'kys' in message.content:
+        try:
+            await message.delete()
+        except:
+            pass
+        await message.author.send(f"Hi, {message.author.mention}. Your message violated many of our rules. The phrase `kys` is  offensive to others and we consider that a type of harassment. Please don't not use it inside the Kingdom, not even in <#243236666641219585>! If you have any further questions, feel free to ask any staff members. Thank you and enjoy your time in the Kingdom!")
+    await bot.process_commands(message)
+
 @bot.command()
 async def ping(ctx):
     'Pong!'
@@ -95,71 +78,35 @@ async def ping(ctx):
     pong = discord.Embed(title='Pong!', description=(str((ping.microseconds / 1000.0)) + ' ms'), color=65535)
     await ctx.send(embed=pong)
 
+@commands.is_owner()
 @bot.command()
 async def restart(ctx):
     'Restarts the bot.'
-    if (ctx.author.id == 180314310298304512):
-        channel = ctx.channel
-        await ctx.send('Restarting...')
-        await bot.logout()
-
-async def send_cmd_help(ctx):
-    if ctx.invoked_subcommand:
-        pages = bot.formatter.format_help_for(ctx, ctx.invoked_subcommand)
-        for page in pages:
-            print(page)
-            await ctx.channel.send(embed=page)
-    else:
-        pages = bot.formatter.format_help_for(ctx, ctx.command)
-        for page in pages:
-            print(page)
-            await ctx.channel.send(embed=page)
-
-@bot.event
-async def on_command_error(ctx, error):
-    print(''.join(traceback.format_exception(type(error), error, error.__traceback__)))
     channel = ctx.channel
-    if isinstance(error, commands.MissingRequiredArgument):
-        if ctx.message.content.startswith('>trophy'):
-            embed = discord.Embed(title='>trophy <current amount of trophies>', description='We will suggest Clans that meet your trophy level!', color=15105570)
-            await channel.send(embed=embed)
-        else:
-            await send_cmd_help(ctx)
-    elif isinstance(error, commands.BadArgument):
-        await send_cmd_help(ctx)
-    elif isinstance(error, commands.DisabledCommand):
-        await channel.send('That command is disabled.')
-    elif isinstance(error, commands.CommandInvokeError):
-        no_dms = 'Cannot send messages to this user'
-        is_help_cmd = (ctx.command.qualified_name == 'help')
-        is_forbidden = isinstance(error.original, discord.Forbidden)
-        if (is_help_cmd and is_forbidden and (error.original.text == no_dms)):
-            msg = "I couldn't send the help message to you in DM. Either you blocked me or you disabled DMs in this server."
-            await channel.send(msg)
-            return
+    await ctx.send('Restarting...')
+    await bot.logout()
 
+@commands.is_owner()
 @bot.command()
 async def coglist(ctx):
     'See unloaded and loaded cogs!'
-    if (ctx.author.id == 180314310298304512):
-
-        def pagify(text, delims=['\n'], *, escape=True, shorten_by=8, page_length=2000):
-            'DOES NOT RESPECT MARKDOWN BOXES OR INLINE CODE'
-            in_text = text
+    def pagify(text, delims=['\n'], *, escape=True, shorten_by=8, page_length=2000):
+        'DOES NOT RESPECT MARKDOWN BOXES OR INLINE CODE'
+        in_text = text
+        if escape:
+            num_mentions = (text.count('@here') + text.count('@everyone'))
+            shorten_by += num_mentions
+        page_length -= shorten_by
+        while (len(in_text) > page_length):
+            closest_delim = max([in_text.rfind(d, 0, page_length) for d in delims])
+            closest_delim = (closest_delim if (closest_delim != (- 1)) else page_length)
             if escape:
-                num_mentions = (text.count('@here') + text.count('@everyone'))
-                shorten_by += num_mentions
-            page_length -= shorten_by
-            while (len(in_text) > page_length):
-                closest_delim = max([in_text.rfind(d, 0, page_length) for d in delims])
-                closest_delim = (closest_delim if (closest_delim != (- 1)) else page_length)
-                if escape:
-                    to_send = escape_mass_mentions(in_text[:closest_delim])
-                else:
-                    to_send = in_text[:closest_delim]
-                yield to_send
-                in_text = in_text[closest_delim:]
-            yield in_text
+                to_send = escape_mass_mentions(in_text[:closest_delim])
+            else:
+                to_send = in_text[:closest_delim]
+            yield to_send
+            in_text = in_text[closest_delim:]
+        yield in_text
 
     def box(text, lang=''):
         ret = '```{}\n{}\n```'.format(lang, text)
@@ -242,7 +189,8 @@ async def _eval(ctx, *, body: str):
         await out.add_reaction('\u2705')
     if err:
         await err.add_reaction('\u2049')
-
+    else:
+        await out.add_reaction('\u2705')
 
 def cleanup_code(content):
     """Automatically removes code blocks from the code."""
@@ -262,16 +210,16 @@ def get_syntax_error(e):
 @bot.command()
 async def say(ctx, *, message: str):
     'Say something as the bot.'
-    if (discord.utils.get(ctx.author.roles, id=298817057426767873) != None):
-        if ('{}say'.format(ctx.prefix) in message):
-            await ctx.send("Don't ya dare spam.")
-        else:
-            await ctx.send(message)
+    if ('{}say'.format(ctx.prefix) in message):
+        await ctx.send("Don't ya dare spam.")
+    else:
+        await ctx.send(message)
 
+@commands.is_owner()
 @bot.command()
 async def source(ctx, *, command: str=None):
     'Displays my full source code or for a specific command.\n    To display the source code of a subcommand you can separate it by\n    periods, e.g. tag.create for the create subcommand of the tag command\n    or by spaces.\n    '
-    source_url = 'https://github.com/fourjr/stusarmybot'
+    source_url = 'https://github.com/fourjr/kairostimebot'
     if (command is None):
         await ctx.send(source_url)
         return
@@ -284,7 +232,7 @@ async def source(ctx, *, command: str=None):
         location = os.path.relpath(src.co_filename).replace('\\', '/')
     else:
         location = (obj.callback.__module__.replace('.', '/') + '.py')
-        source_url = 'https://github.com/fourjr/stusarmybot'
+        source_url = 'https://github.com/fourjr/kairostimebot'
     final_url = '<{}/blob/master/{}#L{}-L{}>'.format(source_url, location, firstlineno, ((firstlineno + len(lines)) - 1))
     await ctx.send(final_url)
 
