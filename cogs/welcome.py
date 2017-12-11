@@ -44,7 +44,7 @@ If you are from a Kairos Kingdom Clan, drop a message in <#287328907160715265> t
                     warning.delete()
                 return
             if message.content.lower() == 'agree':
-                await message.author.add_roles(discord.utils.get(message.guild.roles, id=243812023085826048), discord.utils.get(message.guild.roles, id=337301153622654976), reason='Member said agree') #vg, cr
+                await message.author.add_roles(discord.utils.get(message.guild.roles, id=243812023085826048), reason='Member said agree') #vg
                 await discord.utils.get(message.guild.channels, id=238743527515750400).send(f'Welcome {message.author.mention} to the Kairos Kingdom! Have fun! :)')
                 await discord.utils.get(message.guild.channels, id=249608247697211392).send(embed=discord.Embed(title=f'{message.author} has been verified', description = f'User Verified', color=0xf1c40f))
                 await message.channel.purge(limit=50, before=None, after=None, check=lambda e: e.author == message.author)
