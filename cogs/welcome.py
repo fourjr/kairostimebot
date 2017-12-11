@@ -5,7 +5,6 @@ import asyncio
 class welcome():
     def __init__(self, bot):
         self.bot = bot
-        self.sessions = set()
 
     async def on_member_join(self, member):
         try:
